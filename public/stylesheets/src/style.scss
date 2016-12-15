@@ -1,0 +1,69 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
+}
+
+a {
+  color: #00B7FF;
+}
+
+.userinfo-container {
+  margin: 0 0 2em;
+}
+
+.rooms-list {
+  margin: 2em 0;
+
+}
+
+.rooms-list__room {
+  margin: 0 0 1em;
+  padding: 1em;
+  background: #eee;
+  font: 2em sans-serif;
+}
+
+.gomoku-container {
+  display: flex;
+}
+
+.gomoku-container__table {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.gomoku-container__row {
+  display: flex;
+  flex-direction: row;
+  height: 3em;
+}
+
+.gomoku-container__row__cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3em;
+
+  margin: 0.1em;
+  border: 1px solid black;
+}
+
+.gomoku-container__row__cell__circle {
+  width: 2em;
+  height: 2em;
+  border-radius: 2em;
+  &.white {
+    border: 1px solid black;
+  }
+  &.black {
+    background: #000;
+  }
+}
