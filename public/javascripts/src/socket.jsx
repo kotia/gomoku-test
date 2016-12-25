@@ -67,6 +67,7 @@ export function goMiddleware(store) {
                     socket.emit('room:create', action.isWhite);
                     break;
                 case CHOOSE_ROOM:
+                    console.log(action);
                     socket.emit('room:choose', action.id);
                     break;
                 case MAKE_TURN:

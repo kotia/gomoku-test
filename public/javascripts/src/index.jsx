@@ -5,7 +5,7 @@ import { connect, Provider } from 'react-redux';
 import {store} from "store";
 import {setName, giveName, sendExitRoom, createRoom, makeTurn, chooseRoom} from "actions";
 
-import {RoomsListContainer as RoomsList} from "./roomsList";
+import {ConnectedRoomsListContainer as RoomsList} from "./roomsList";
 import {Room} from "./room";
 import {executeListeners} from "./socket";
 
@@ -18,9 +18,7 @@ class IndexContainer extends React.Component {
             setName: this.setName.bind(this),
             handleChange: this.handleChange.bind(this),
             exitRoom: this.exitRoom.bind(this),
-            makeTurn: this.makeTurn.bind(this),
-            createRoom: this.createRoom.bind(this),
-            chooseRoom: this.chooseRoom.bind(this)
+            makeTurn: this.makeTurn.bind(this)
         }
     }
 
@@ -44,16 +42,6 @@ class IndexContainer extends React.Component {
         this.props.onMakeTurn(e.currentTarget.dataset.cell);
     }
 
-    createRoom(e) {
-        let isWhite = e.currentTarget.dataset.color == 'white';
-        this.props.onCreateRoom(isWhite);
-    }
-
-    chooseRoom(e) {
-        let id = e.currentTarget.dataset.id;
-        this.props.onChooseRoom(id);
-    }
-
     render(){
         return (
             <Index
@@ -73,7 +61,7 @@ class Index extends React.Component {
     render() {
         let container = this.props.room.table ?
             <Room actions={this.props.actions} user={this.props.user} room={this.props.room} /> :
-            <RoomsList actions={this.props.actions} rooms={this.props.rooms} />;
+            <RoomsList />;
         let nameElement = this.props.user.name && this.props.user.nameSaved ?
             (
                 <div>Your name is {this.props.user.name}</div>
@@ -115,12 +103,6 @@ const mapDispatchToProps = (dispatch) => ({
     },
     onMakeTurn(id) {
         dispatch(makeTurn(id));
-    },
-    onCreateRoom(isWhite) {
-        dispatch(createRoom(isWhite));
-    },
-    onChooseRoom(id) {
-        dispatch(chooseRoom(id));
     }
 });
 

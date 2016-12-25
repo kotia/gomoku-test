@@ -1,21 +1,9 @@
 "use strict";
 import * as React from "react";
+import { connect } from 'react-redux';
+import {createRoom, chooseRoom} from "actions";
 
-export class RoomsListContainer extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
-    render() {
-        return (
-            <div>
-                <CreateRoomButtons createRoom={this.props.actions.createRoom}/>
-                <RoomsList chooseRoom={this.props.actions.chooseRoom} rooms={this.props.rooms}/>
-            </div>
-
-        );
-    }
-}
 
 class CreateRoomButtons extends React.Component {
     constructor(props) {
@@ -55,3 +43,49 @@ class RoomsList extends React.Component {
         );
     }
 }
+
+class RoomsListContainer extends React.Component {
+    constructor(props) {
+        super(props);
+        this.actions = {
+            createRoom: this.createRoom.bind(this),
+            chooseRoom: this.chooseRoom.bind(this)
+        }
+    }
+
+    createRoom(e) {
+        let isWhite = e.currentTarget.dataset.color == 'white';
+        this.props.onCreateRoom(isWhite);
+    }
+
+    chooseRoom(e) {
+        console.log(e.currentTarget.dataset);
+        let id = e.currentTarget.dataset.id;
+        this.props.onChooseRoom(id);
+    }
+
+    render() {
+        return (
+            <div>
+                <CreateRoomButtons createRoom={this.actions.createRoom}/>
+                <RoomsList chooseRoom={this.actions.chooseRoom} rooms={this.props.rooms}/>
+            </div>
+
+        );
+    }
+}
+
+const mapStateToProps = (store) => ({
+    rooms: store.rooms
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    onCreateRoom(isWhite) {
+        dispatch(createRoom(isWhite));
+    },
+    onChooseRoom(id) {
+        dispatch(chooseRoom(id));
+    }
+});
+
+export const ConnectedRoomsListContainer = connect(mapStateToProps, mapDispatchToProps)(RoomsListContainer);

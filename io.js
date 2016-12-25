@@ -164,7 +164,7 @@ module.exports.init = function(server) {
         });
 
         socket.on('room:choose', function(id) {
-            room = rooms.find((room) => room.id === id);
+            room = rooms.find((room) => room.id == id);
             user.isWhite = !room.creatorIsWhite;
             room.opponentId = user.id;
             room.opponentName = user.name;
