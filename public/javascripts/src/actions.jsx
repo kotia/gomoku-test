@@ -1,5 +1,3 @@
-import {socket} from "./socket";
-
 export const FETCH_ROOMS = "FETCH_ROOMS";
 export const ENTER_ROOM = "ENTER_ROOM";
 export const EXIT_ROOM = "EXIT_ROOM";
@@ -10,11 +8,18 @@ export const GAME_IMPOSSIBLE = "GAME_IMPOSSIBLE";
 
 export const GIVE_ID = "GIVE_ID";
 export const GIVE_NAME = "GIVE_NAME";
+export const SAVE_NAME = "SAVE_NAME";
+
+export const CREATE_ROOM = Symbol();
+export const CHOOSE_ROOM = Symbol();
+export const MAKE_TURN = Symbol();
+export const SET_NAME = Symbol();
+export const SEND_EXIT_ROOM = Symbol();
 
 export function fetchRooms(rooms) {
     return {
         type: FETCH_ROOMS,
-        rooms: rooms
+        rooms
     }
 }
 
@@ -28,14 +33,20 @@ export function giveId(id) {
 export function giveName(name) {
     return {
         type: GIVE_NAME,
-        name: name
+        name
+    }
+}
+
+export function saveName() {
+    return {
+        type: SAVE_NAME
     }
 }
 
 export function enterRoom(room) {
     return {
         type: ENTER_ROOM,
-        room: room
+        room
     }
 }
 
@@ -48,7 +59,7 @@ export function exitRoom() {
 export function updateRoom(room) {
     return {
         type: UPDATE_ROOM,
-        room: room
+        room
     }
 }
 
@@ -71,23 +82,37 @@ export function impossibleGame() {
 }
 
 export function createRoom(isWhite) {
-    socket.emit('room:create', isWhite);
+    return {
+        type: CREATE_ROOM,
+        isWhite
+    };
 }
 
 export function chooseRoom(id) {
-    socket.emit('room:choose', id);
+    return {
+        type: CHOOSE_ROOM,
+        id
+    };
 }
 
 export function makeTurn(id) {
-    socket.emit('room:makeTurn', id);
+    return {
+        type: MAKE_TURN,
+        id
+    };
 }
 
 export function setName(name) {
-    socket.emit('name:set', name);
+    return {
+        type: SET_NAME,
+        name
+    };
 }
 
 export function sendExitRoom() {
-    socket.emit('room:exit');
+    return {
+        type: SEND_EXIT_ROOM
+    };
 }
 
 

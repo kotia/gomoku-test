@@ -1,5 +1,6 @@
-import { createStore, combineReducers } from 'redux'
+import { createStore, combineReducers, applyMiddleware } from 'redux'
 import * as actionTypes from 'actions'
+import {goMiddleware} from 'socket'
 
 const roomsReducer = function(state = [], action) {
     if (action.type === actionTypes.FETCH_ROOMS) {
@@ -64,7 +65,7 @@ const roomReducer = function (state = {}, action) {
     }
 };
 
-const userReducer = function(state = {userId: 0, name: ""}, action){
+const userReducer = function(state = {userId: 0, name: "", nameSaved: false}, action){
     if (action.type === actionTypes.GIVE_ID) {
         return Object.assign({}, state, {
             userId: action.userId
@@ -73,7 +74,10 @@ const userReducer = function(state = {userId: 0, name: ""}, action){
         return Object.assign({}, state, {
             name: action.name
         });
-
+    } else if (action.type === actionTypes.SAVE_NAME) {
+        return Object.assign({}, state, {
+            nameSaved: true
+        });
     } else {
         return state;
     }
@@ -85,4 +89,4 @@ const reducers = combineReducers({
     user: userReducer
 });
 
-export const store = createStore(reducers);
+export const store = applyMiddleware(goMiddleware)(createStore)(reducers);

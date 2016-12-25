@@ -3,68 +3,64 @@ import * as ReactDOM from "react-dom";
 import { connect, Provider } from 'react-redux';
 
 import {store} from "store";
-import {fetchRooms, giveId, enterRoom, exitRoom, setName, giveName,
-    updateRoom, winGame, defeatGame, impossibleGame} from "actions";
+import {setName, giveName, sendExitRoom, createRoom, makeTurn, chooseRoom} from "actions";
 
 import {RoomsListContainer as RoomsList} from "./roomsList";
 import {Room} from "./room";
-import {socket} from "./socket";
+import {executeListeners} from "./socket";
 
 
 class IndexContainer extends React.Component {
     constructor(props){
         super(props);
+
+        this.actions = {
+            setName: this.setName.bind(this),
+            handleChange: this.handleChange.bind(this),
+            exitRoom: this.exitRoom.bind(this),
+            makeTurn: this.makeTurn.bind(this),
+            createRoom: this.createRoom.bind(this),
+            chooseRoom: this.chooseRoom.bind(this)
+        }
     }
 
     componentDidMount(){
-        let userId = window.localStorage.userId;
+        executeListeners(store);
+    }
 
-        socket.on('give:id', (id) => {
-            store.dispatch(giveId(id));
-            window.localStorage.userId = id;
-        });
+    setName() {
+        this.props.onSetName(this.props.user.name);
+    }
 
-        socket.on('give:name', (name) => {
-            store.dispatch(giveName(name));
-        });
+    handleChange(e) {
+        this.props.onGiveName(e.target.value);
+    }
 
-        socket.on('rooms:list', (rooms) => {
-            store.dispatch(fetchRooms(rooms));
-        });
+    exitRoom() {
+        this.props.onExitRoom();
+    }
 
-        socket.on('room:enter', (room) => {
-            store.dispatch(enterRoom(room));
-        });
+    makeTurn(e) {
+        this.props.onMakeTurn(e.currentTarget.dataset.cell);
+    }
 
-        socket.on('room:update', (room) => {
-            console.log(room.creatorName);
-            console.log(room.opponentName);
-            console.log('--||--');
-            store.dispatch(updateRoom(room));
-        });
+    createRoom(e) {
+        let isWhite = e.currentTarget.dataset.color == 'white';
+        this.props.onCreateRoom(isWhite);
+    }
 
-        socket.on('room:impossible', () => {
-            store.dispatch(impossibleGame());
-        });
-
-        socket.on('room:victory', () => {
-            store.dispatch(winGame());
-        });
-
-        socket.on('room:defeat', () => {
-            store.dispatch(defeatGame());
-        });
-
-        socket.on('room:exit', () => {
-            store.dispatch(exitRoom());
-        });
-
-        socket.emit('page:loaded', userId || 'no');
+    chooseRoom(e) {
+        let id = e.currentTarget.dataset.id;
+        this.props.onChooseRoom(id);
     }
 
     render(){
         return (
-            <Index user={this.props.user} room={this.props.room} rooms={this.props.rooms} />
+            <Index
+                actions={this.actions}
+                user={this.props.user}
+                room={this.props.room}
+                rooms={this.props.rooms} />
         )
     }
 }
@@ -72,31 +68,20 @@ class IndexContainer extends React.Component {
 class Index extends React.Component {
     constructor(props){
         super(props);
-        this.state = {
-            name: props.user.name
-        }
-    }
-
-    handleChange(e){
-        this.setState({name: e.target.value});
-    }
-
-    saveName(){
-        setName(this.state.name)
     }
 
     render() {
         let container = this.props.room.table ?
-            <Room user={this.props.user} room={this.props.room} /> :
-            <RoomsList rooms={this.props.rooms} />;
-        let nameElement = this.props.user.name ?
+            <Room actions={this.props.actions} user={this.props.user} room={this.props.room} /> :
+            <RoomsList actions={this.props.actions} rooms={this.props.rooms} />;
+        let nameElement = this.props.user.name && this.props.user.nameSaved ?
             (
                 <div>Your name is {this.props.user.name}</div>
             ):(
                 <div>
                     What is you name?
-                    <input type="text" value={this.state.name} onChange={this.handleChange.bind(this)} />
-                    <button onClick={this.saveName.bind(this)}>Save name!</button>
+                    <input type="text" value={this.props.user.name} onChange={this.props.actions.handleChange} />
+                    <button onClick={this.props.actions.setName}>Save name!</button>
                 </div>
         );
 
@@ -112,15 +97,34 @@ class Index extends React.Component {
     }
 }
 
-const mapStateToProps = function(store) {
-    return {
+const mapStateToProps = (store) => ({
         rooms: store.rooms,
         room: store.room,
         user: store.user
-    };
-};
+});
 
-const MainContainer = connect(mapStateToProps)(IndexContainer);
+const mapDispatchToProps = (dispatch) => ({
+    onGiveName(name) {
+        dispatch(giveName(name));
+    },
+    onSetName(name) {
+        dispatch(setName(name));
+    },
+    onExitRoom() {
+        dispatch(sendExitRoom());
+    },
+    onMakeTurn(id) {
+        dispatch(makeTurn(id));
+    },
+    onCreateRoom(isWhite) {
+        dispatch(createRoom(isWhite));
+    },
+    onChooseRoom(id) {
+        dispatch(chooseRoom(id));
+    }
+});
+
+const MainContainer = connect(mapStateToProps, mapDispatchToProps)(IndexContainer);
 
 
 export function start() {

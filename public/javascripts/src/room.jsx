@@ -1,14 +1,9 @@
 "use strict";
 import * as React from "react";
-import {makeTurn, sendExitRoom} from "actions";
 
 export class Room extends React.Component {
     constructor(props) {
         super(props);
-    }
-
-    exitRoom() {
-        sendExitRoom();
     }
 
     render() {
@@ -23,6 +18,7 @@ export class Room extends React.Component {
             acc[acc.length-1].push(val);
             return acc;
         }, []);
+
         let userIsCreator = this.props.user.userId === this.props.room.creatorId;
         let userIsWhite = userIsCreator === this.props.room.creatorIsWhite;
         let isUserTurn = userIsWhite === this.props.room.isWhiteTurn;
@@ -31,11 +27,11 @@ export class Room extends React.Component {
             <div className="gomoku-container">
                 <div className="gomoku-container__table">
                     {rows.map((cells, index)=> (
-                        <GomokuTableRow cells={cells} key={index} />
+                        <GomokuTableRow isTurn={isUserTurn} makeTurn={this.props.actions.makeTurn} cells={cells} key={index} />
                     ))}
                 </div>
                 <div className="gomoku-container__info">
-                    <button onClick={this.exitRoom}>Exit this room!</button>
+                    <button onClick={this.props.actions.exitRoom}>Exit this room!</button>
                     <br/>
                     {'Your color is ' + (userIsWhite ? 'white' : 'black')}
                     <br/>
@@ -65,15 +61,15 @@ class GomokuTableRow extends React.Component {
         super(props);
     }
 
-    makeTurn(id) {
-        makeTurn(id);
-    }
-
     render() {
         return (
             <div className="gomoku-container__row">
                 {this.props.cells.map((cell, index) =>
-                    (<div onClick={this.makeTurn.bind(this, cell.id)} key={index} className="gomoku-container__row__cell">
+                    (<div
+                        onClick={cell.isEmpty && this.props.isTurn ? this.props.makeTurn : ""}
+                        data-cell={cell.id}
+                        key={index}
+                        className="gomoku-container__row__cell">
                         <div className={
                             'gomoku-container__row__cell__circle ' +
                             (cell.isEmpty ? '' : (cell.isWhite ? 'white' : 'black'))

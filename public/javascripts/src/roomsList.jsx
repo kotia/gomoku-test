@@ -1,6 +1,5 @@
 "use strict";
 import * as React from "react";
-import {createRoom, chooseRoom} from "actions";
 
 export class RoomsListContainer extends React.Component {
     constructor(props) {
@@ -10,8 +9,8 @@ export class RoomsListContainer extends React.Component {
     render() {
         return (
             <div>
-                <CreateRoomButtons/>
-                <RoomsList rooms={this.props.rooms}/>
+                <CreateRoomButtons createRoom={this.props.actions.createRoom}/>
+                <RoomsList chooseRoom={this.props.actions.chooseRoom} rooms={this.props.rooms}/>
             </div>
 
         );
@@ -23,15 +22,11 @@ class CreateRoomButtons extends React.Component {
         super(props);
     }
 
-    createRoom(isWhite) {
-        createRoom(isWhite);
-    }
-
     render() {
         return (
             <div className="create-room-buttons">
-                <button onClick={this.createRoom.bind(this, true)}>Create room with you as White!</button>
-                <button onClick={this.createRoom.bind(this, false)}>Create room with you as Black!</button>
+                <button data-color="white" onClick={this.props.createRoom}>Create room with you as White!</button>
+                <button data-color="black" onClick={this.props.createRoom}>Create room with you as Black!</button>
             </div>
         );
     }
@@ -42,17 +37,14 @@ class RoomsList extends React.Component {
         super(props);
     }
 
-    chooseRoom(id) {
-        chooseRoom(id);
-    }
-
     render() {
         return (
             <div className="rooms-list">
                 {this.props.rooms.map((room, index) => {
                     return(
                         <div className="rooms-list__room"
-                             onClick={this.chooseRoom.bind(this, room.id)}
+                             onClick={this.props.chooseRoom}
+                             data-id={room.id}
                              key={index}
                         >
                             {room.creatorName || room.id}: {'You play ' + (room.isYouWhite ? 'white' : 'black')}
